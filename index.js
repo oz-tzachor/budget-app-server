@@ -6,13 +6,13 @@ require("dotenv").config();
 const { dealWithMessage } = require("./DL/bot/bot");
 const { loadMainSocket } = require("./DL/sockets/socket");
 const router = require("./Routers");
-
+const cors = require("cors");
 const io = new Server(4001, {
   cors: "*",
 });
 
 app.use(express.json());
-app.use(require("cors")());
+app.use(cors({origin:"*"}));
 app.use("/api", router);
 
 require("./DL/db")
