@@ -10,6 +10,7 @@ router.post("/register", async (req, res) => {
 });
 
 router.post("/login", async (req, res) => {
+  generateClassId
   console.log("start login");
   try {
     const users = await userLogic.login(req.body);

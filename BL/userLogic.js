@@ -28,7 +28,7 @@ const createNewUser = async (user) => {
     }
     const { email } = user;
     const userExist = await userController.readOne({ email });
-    if (userExist) throw { code: 409, message: "user Exist", email };
+    if (userExist) throw { code: 409, message: "user Exicst", email };
     let hashedPassword = await bcrypt.hash(user.password, salt);
     user.password = hashedPassword;
     const newUser = await userController.create(user);
@@ -52,23 +52,23 @@ const login = async (loginDetails) => {
     const requestedUser = await userController.readOne({ email });
     if (!requestedUser) {
       throw { code: 400, message: "One of your credentials is worng" };
+    }
+
+    const dePassword = await bcrypt.compare(
+      loginDetails.password,
+      requestedUser.password
+    );
+    if (dePassword) {
+      const token = jwtFn.createToken({
+        firstName: requestedUser.firstName,
+        lastName: requestedUser.lastName,
+        _id: requestedUser._id,
+        email: requestedUser.email,
+      });
+      requestedUser.password = undefined;
+      return { token, user: requestedUser };
     } else {
-      const dePassword = await bcrypt.compare(
-        loginDetails.password,
-        requestedUser.password
-      );
-      if (dePassword) {
-        const token = jwtFn.createToken({
-          firstName: requestedUser.firstName,
-          lastName: requestedUser.lastName,
-          _id: requestedUser._id,
-          email: requestedUser.email,
-        });
-        requestedUser.password = undefined;
-        return { token, user: requestedUser };
-      } else {
-        throw { code: 400, message: "One of your credentials is worng" };
-      }
+      throw { code: 400, message: "One of your credentials is worng" };
     }
   } catch (e) {
     console.log(e);
